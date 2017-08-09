@@ -56,8 +56,8 @@
     <GitVersioningDir>$(PackagesDir)\Nerdbank.GitVersioning\$(GitVersioningVersion)\build\</GitVersioningDir>
 
     <!-- Tell build tools to use the full framework dlls that contain build tasks (like the nuget assets task) -->
-    <BuildToolsTaskDir>$(ToolsDir)net45/</BuildToolsTaskDir>
-    <PackagingTaskDir>$(ToolsDir)net45/</PackagingTaskDir>
+    <BuildToolsTaskDir>$(ToolsDir)/</BuildToolsTaskDir>
+    <PackagingTaskDir>$(ToolsDir)/</PackagingTaskDir>
 
     <!-- Output directories -->
     <BinDir>$(RepoRoot)bin$([System.IO.Path]::DirectorySeparatorChar)</BinDir>
@@ -83,7 +83,7 @@
     <DnuCoreRestoreCommand Condition="'$(OsEnvironment)'=='OSX'">ulimit -n 2500 ; $(DnuCoreRestoreCommand)</DnuCoreRestoreCommand>
 
     <!-- Temporary until everything supports lowercase package directory names -->
-    <DnuCoreRestoreCommand>$(DnuCoreRestoreCommand) --legacy-packages-directory</DnuCoreRestoreCommand>
+    <DnuCoreRestoreCommand>$(DnuCoreRestoreCommand)</DnuCoreRestoreCommand>
 
     <!-- packageresolve.targets from build tools uses the DnuRestoreCommand property. Setting it to use dotnet CLI under the hood-->
     <DnuRestoreCommand>$(DnuCoreRestoreCommand) --packages $(PackagesDir)</DnuRestoreCommand>

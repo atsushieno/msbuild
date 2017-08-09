@@ -75,7 +75,7 @@
           />
   </Target>
 
-  <UsingTask TaskName="PrereleaseResolveNuGetPackageAssets" AssemblyFile="$(ToolsDir)net45/Microsoft.DotNet.Build.Tasks.dll"/>
+  <UsingTask TaskName="PrereleaseResolveNuGetPackageAssets" AssemblyFile="$(ToolsDir)Microsoft.DotNet.Build.Tasks.dll"/>
 
   <PropertyGroup>
     <!--At build time, we target netstandard to be runnable on many runtimes.
@@ -85,48 +85,40 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <RuntimeProjectJson Include="$(MSBuildThisFileDirectory)runtimeDependencies\project.json">
-      <LockFile>$(MSBuildThisFileDirectory)runtimeDependencies\project.lock.json</LockFile>
+    <RuntimeProjectCsproj Include="$(MSBuildThisFileDirectory)runtimeDependencies\project.csproj">
       <DestinationFolder>$(DeploymentDir)</DestinationFolder>
       <TestDeploymentDir>$(TestDeploymentDir)</TestDeploymentDir>
-    </RuntimeProjectJson>
-    <RuntimeProjectJson Include="$(MSBuildThisFileDirectory)roslyn\project.json">
-      <LockFile>$(MSBuildThisFileDirectory)roslyn\project.lock.json</LockFile>
+    </RuntimeProjectCsproj>
+    <RuntimeProjectCsproj Include="$(MSBuildThisFileDirectory)roslyn\project.csproj">
       <DestinationFolder>$(DeploymentDir)\Roslyn</DestinationFolder>
       <TestDeploymentDir>$(TestDeploymentDir)\Roslyn</TestDeploymentDir>
-    </RuntimeProjectJson>
+    </RuntimeProjectCsproj>
   </ItemGroup>
 
-  <Target Name="RestoreRuntimePackages"
-          Inputs="$(DnuToolPath);@(RuntimeProjectJson)"
-          Outputs="@(RuntimeProjectJson->'%(LockFile)')">
-    <Exec Command="$(DnuRestoreCommand) &quot;%(RuntimeProjectJson.FullPath)&quot;" StandardOutputImportance="Low" />
-
-    <!-- It appears that NuGet doesn't re-write the project.lock.json file if the contents would be the same. This can mess up incremental builds
-        if you make a non-significant change to project.json.  To avoid that, update the timestamp of the lock file here. -->
-    <Touch Files="@(RuntimeProjectJson->'%(LockFile)')" />
+  <Target Name="RestoreRuntimePackages">
+    <Exec Command="$(DnuRestoreCommand) &quot;%(RuntimeProjectCsproj.FullPath)&quot;" StandardOutputImportance="Low" />
   </Target>
 
   <Target Name="DeployRuntime"
           DependsOnTargets="RestoreRuntimePackages"
-          Outputs="%(RuntimeProjectJson.LockFile).IntentionallyDoesNotExistSoThisAlwaysRuns">
+          >
     <PrereleaseResolveNuGetPackageAssets AllowFallbackOnTargetSelection="true"
                                          IncludeFrameworkReferences="false"
                                          NuGetPackagesDirectory="$(PackagesDir)"
                                          RuntimeIdentifier="$(NuGetRuntimeIdentifier)"
                                          ProjectLanguage="C#"
-                                         ProjectLockFile="@(RuntimeProjectJson->'%(LockFile)')"
+                                         ProjectLockFile="@(RuntimeProjectCsproj)"
                                          TargetMonikers="$(NuGetTargetMoniker)">
       <Output TaskParameter="ResolvedCopyLocalItems" ItemName="ResolvedRuntimeFiles" />
     </PrereleaseResolveNuGetPackageAssets>
 
     <!-- Copy the dependencies to both the deployment and the test directories -->
     <Copy SourceFiles="@(ResolvedRuntimeFiles)"
-          DestinationFolder="@(RuntimeProjectJson->'%(DestinationFolder)')"
+          DestinationFolder="@(RuntimeProjectCsproj->'%(DestinationFolder)')"
           SkipUnchangedFiles="true"
           />
     <Copy SourceFiles="@(ResolvedRuntimeFiles)"
-          DestinationFolder="@(RuntimeProjectJson->'%(TestDeploymentDir)')"
+          DestinationFolder="@(RuntimeProjectCsproj->'%(TestDeploymentDir)')"
           SkipUnchangedFiles="true"
           />
 

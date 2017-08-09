@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+    <AssemblyName>.nuget</AssemblyName>
+    <PackageId>.nuget</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.runner.console" Version="2.1.0" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="1.5.46" />
+    <PackageReference Include="NuSpec.ReferenceGenerator" Version="1.4.2" />
+    <PackageReference Include="Microsoft.Net.Compilers" Version="2.2.0" />
+    <PackageReference Include="MicroBuild.Core" Version="0.2.0" />
+    <PackageReference Include="Microsoft.DotNet.BuildTools.GenAPI" Version="1.0.0-beta2-00731-01" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>
